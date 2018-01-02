@@ -25,14 +25,17 @@ def convert():
         blob.download_to_filename(ogg_file_name)
         print("++++Downloaded")
         wav_file_name = './wav/' + just_name + ".wav"
-        call(["ffmpeg", "-i", ogg_file_name, wav_file_name])
-        print("++++Converted")
         blob_wav_name = 'wav/' + just_name + ".wav"
-        blob_wav = storage.Blob(blob_wav_name, bucket)
-        blob_wav.upload_from_filename(wav_file_name)
-        print("++++Uploaded")
-        bucket.copy_blob(blob, bucket, "ogg/" + blob.name)
-        print("++++Copied")
+        try:
+            call(["ffmpeg", "-i", ogg_file_name, wav_file_name])
+            print("++++Converted")
+            blob_wav = storage.Blob(blob_wav_name, bucket)
+            blob_wav.upload_from_filename(wav_file_name)
+            print("++++Uploaded")
+            bucket.copy_blob(blob, bucket, "ogg/" + blob.name)
+            print("++++Copied")
+        except IOError:
+            continue
         if is_converted(blob):
             print("++++Successfully converted. Deleting.")
             blob.delete()
